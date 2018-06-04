@@ -1,0 +1,119 @@
+{% extends "index_base.html" %}
+{% block style %}
+        .comment{
+            margin-left: 30px;
+        }
+        #commentArea{
+        background-color:#F5F5F5;
+    }
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <ul class="list-group col-md-8">
+            <div class="article-list" >
+                <button class="btn btn-default"  type="button"  onclick="displayForm(0)">发布动态</button>
+                <form name="biaoge" id="0" style="display: none" action="{% url 'moments' %}" method="POST" novalidate>
+                    <textarea name="article" id="t0" ></textarea>
+                    <input type="text" style="display: none;" name="user_id" value="{{ user.nid }}">
+                    <input class="huifu" name="huifu" id="id_0" type="submit" value="发表" ><span class="word_surplus" style="float: right;"></span>
+                </form>
+            </div>
+            <div style="height: 50px;"></div>
+               {% for article_comment in articles_list %}
+                 <li class="list-group-item">
+                     <h5 class="list-group-item-heading fa fa-address-book" style="color:#2446AB;">{{ article_comment.article.user.nickname}}:</h5>
+                     <h5 class="list-group-item-text" id="content">{{ article_comment.article.content |safe}}</h5>
+                    <h6 align="left">{{ article_comment.article.create_time }}</h6>
+                    <button class="btn btn-default  btn-xs" type="button" onclick="displayForm({{ forloop.counter }})">评论</button>
+                    <div class="formContainer">
+                         <form name="biaoge" id={{ forloop.counter }} style="display:none" action="{% url 'reply' %}" method="POST" novalidate>
+                        <textarea name="comment" id="t{{ forloop.counter }}" ></textarea>
+                        <input type="text" style="display: none;" name="user_id" value="{{ current_user_id }}">
+                        <input type="text" style="display: none;" name="article_id" value="{{ article_comment.article.nid }}">
+                        <input class="huifu" name="huifu" type="submit" value="回复" ><span class="word_surplus" style="float: right;"></span>
+                         </form>
+                    </div>
+{#                    判断是否有评论#}
+                    {% if article_comment.comment %}
+                    <div id="commentArea" >
+                        <div class="comment">
+                            {% for comment in article_comment.comment %}
+                                <div class="content">
+                                    <a style="color:#2446AB;">{{ comment.user.nickname}}</a> : {{ comment.content|safe }}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+                  <ul class="pagination">
+                      {{ page_info.pager|safe }}
+                  </ul>
+            </ul>
+        </div>
+    </div>
+    <script src="/static/kindeditor-4.1.10/kindeditor-all.js"></script>
+    <script src="/static/jquery-3.2.1.js"></script>
+    <script>
+{#        隐藏与显示#}
+        function displayForm(id){
+              var dom = document.getElementById(id);
+              var name = document.getElementsByName('biaoge')
+            for(var n=0;name[n];n++)
+            {
+                if(n == id)
+                {
+                    if(dom.style.display=='inline')
+                          dom.style.display='none';
+                    else
+                          dom.style.display='inline';
+                    continue;
+                }
+                name[n].style.display='none';
+            }
+        }
+
+        // kindeditor : https://blog.csdn.net/ougexingfuba/article/details/72917194
+        var options = {
+                resizeType : 1,     // 2时可以拖动改变宽度和高度，1时只能改变高度，0时不能拖动
+                themeType : 'default',  //风格
+                filterMode : true,
+                allowImageUpload : true,
+                items : [
+                    'source', 'fullscreen', '|', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                    'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                    'insertunorderedlist', '|', 'emoticons', 'image', 'link'
+                ],
+                width : '745px',
+                height: '250px',
+                emoticonsPath : './static/emoticons/',
+                afterChange : function() {
+                        //限制字数
+                          var limitNum = 1000;  //设定限制字数
+                          var pattern = '还可以输入' + limitNum + '字';
+                          $('.word_surplus').html(pattern); //输入显示
+                          if(this.count('text') > limitNum) {
+                               pattern = ('字数超过限制，请适当删除部分内容');
+                                $('.huifu').attr('disabled','disabled')
+                           } else {
+                               //计算剩余字数
+                               $('.huifu').removeAttr('disabled');
+                               var result = limitNum - this.count('text');
+                               pattern = '还可以输入' +  result + '字';
+                           }
+                           $('.word_surplus').html(pattern); //输入显示
+                    }
+                    };
+            var editor = new Array();
+            KindEditor.ready(function(K) {
+                editor[0] = K.create("#t0",options);
+                for (var n=1;;n++)
+                    {
+                        editor[n] = K.create("#t"+n,options);
+                        if (!editor[n])
+                            break;
+                    }
+            });
+    </script>
+{% endblock %}

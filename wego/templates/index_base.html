@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WEGO</title>
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7-dist/css/bootstrap.css">
+    <link rel="stylesheet" href="/static/font-awesome-4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="/static/css/commons.css">
+    <script src="/static/jquery-3.2.1.js"></script>
+    <script src="/static/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+    <style>
+        {% block style %}
+        {% endblock %}
+    </style>
+</head>
+<body>
+{#    bootstrap默认样式导航栏#}
+    <nav class="navbar navbar-default no-radius" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand">WeGo</a>
+        </div>
+          <ul class="nav navbar-nav">
+                <li ><a href="{% url 'friendsList' %}">好友</a></li>
+                <li ><a href="{% url 'moments' %}">朋友圈</a></li>
+          </ul>
+            <!--向右对齐-->
+           <ul id="uu" class="left nav navbar-nav navbar-right">
+            <li style="width: 200px;height: 50px;text-align: right"><a>{{ user.nickname }}</a></li>
+            <li style="width: 60px;height: 50px; text-align: right"><a href="{% url 'logout' %}">注销</a></li>
+          </ul>
+      </div>
+    </nav>
+
+    {% if user.nickname %}
+        {% block content %}
+        {% endblock %}
+    {% endif %}
+</body>
+</html>

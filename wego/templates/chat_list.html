@@ -1,0 +1,7 @@
+{% for chat in chats %}
+<div class="list-group-item">
+    <h4 class="list-group-item-heading">{{chat.sender.nickname}}：({{chat.time}})</h4>
+    <p>{{chat.content | safe}}</p>
+    <input type="hidden" class="chat_id" value="{{chat.id}}"/>
+</div>
+{% endfor %}

@@ -1,0 +1,72 @@
+{% extends "index_base.html" %}
+
+{% block content %}
+{#    bootstrap的列表组作为背景#}
+    <ul class="list-group col-md-10 col-md-offset-1 well well-sm" id="chat_msg">
+    {% for chat in chats %}
+        <div class="list-group-item">
+            <h4 class="list-group-item-heading">{{chat.sender.nickname}}：({{chat.time}})</h4>
+            <p >{{chat.content|safe}}</p>
+            <input type="hidden" class="chat_id" value="{{chat.id}}"/>
+        </div>
+    {% endfor %}
+    </ul>
+
+    <form id="chatForm" class="form-horizontal panel container"  method="POST" >
+        {% csrf_token %}
+        <div class="form-group col-md-15" align="center">
+            <textarea type="text" name="content" id="content" value="" class="form-control" id="exampleMessage" placeholder=""></textarea>
+         <input type="submit" class="btn btn-default" value="发送"/>
+        </div>
+            <input type="hidden" name="post_type" value="send_chat"/>
+            <input type="hidden" name="friend_id" value="{{ friend_id }}"/>
+    </form>
+
+    <script src="/static/jquery-3.2.1.js"></script>
+    <script src="/static/kindeditor-4.1.10/kindeditor-all.js"></script>
+    <script>
+     $(function() {
+         updateMsg()
+         $("#chatForm").submit(function() {
+        $.post("{% url 'chat_post' %}",
+            $('#chatForm').serialize(),
+            function(data) {
+            $("#content").val("");  //消息发送成功后清空内容框
+        });
+        return false;       //阻止表单提交,否则会刷新页面
+    });
+});
+
+    //更新消息
+    function updateMsg() {
+        $.post(
+            "{% url 'chat_post' %}",{
+                post_type: "get_chat",
+                friend_id:{{ friend_id }},
+                last_chat_id: $(".chat_id").last().val(),
+            },function(data,status) {
+                if(status=='success')
+                    if(data != '')
+                        $("#chat_msg").append(data);
+                setTimeout('updateMsg()',1000)
+            });
+    }
+
+     var options = {
+                filterMode : true,
+                allowImageUpload : true,
+                items : [
+                    'source', 'fullscreen', '|', 'fontname', 'fontsize', '|', 'forecolor', 'hilitecolor', 'bold', 'italic', 'underline',
+                    'removeformat', '|', 'justifyleft', 'justifycenter', 'justifyright', 'insertorderedlist',
+                    'insertunorderedlist', '|', 'emoticons', 'image', 'link'
+                ],
+                width : '800px',
+                height: '200px',
+                emoticonsPath : './static/emoticons/',
+            };
+            var editor = new Array();
+            KindEditor.ready(function(K) {
+                editor[0] = K.create("#content",options);
+            });
+    </script>
+{% endblock %}

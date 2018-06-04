@@ -1,0 +1,22 @@
+<div class="table-responsive">
+            <table class="table table-striped table-hover ">
+               <thead align="center">
+                  <tr>
+                     <th>用户名</th>
+                     <th>昵称</th>
+                     <th align="right">接受/拒绝</th>
+                  </tr>
+               </thead>
+            <tbody>
+               {% for pre_f in preFriends %}
+                  <tr>
+                      <td >{{ pre_f.u_sendReq.username }} </td>
+                     <td>{{ pre_f.u_sendReq.nickname }}</td>
+                      <td><button type="button" class="btn btn-success btn-xs " onclick="request_msg('POST','accept',{{ pre_f.u_sendReq.nid }})" >√</button>
+                     <button type="button" class="btn btn-danger btn-xs " onclick="request_msg('POST','refuse',{{ pre_f.u_sendReq.nid }})" >✖</button>
+                     </td>
+                  </tr>
+               {% endfor %}
+               </tbody>
+            </table>
+        </div>

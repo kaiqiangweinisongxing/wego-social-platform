@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<title>欢迎来到WeGo</title>
+	<link href="/static/bootstrap-3.3.7-dist/css/bootstrap.css" rel="stylesheet">
+    <script src="/static/jquery-3.2.1.js"></script>
+    <script src="/static/bootstrap-3.3.7-dist/js/bootstrap.js"></script>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">			<!--设备兼容   1:1比例-->
+	    <style>
+		 .container {
+		 padding: 18% 20% 20% 20%;
+				width:1500px;
+          		height:500px;
+				text-align:center;
+				vertical-align: middle;
+				color:	#FFFFFF;
+			}
+
+		</style>
+</head>
+<body background="/static/image/bg.png" >
+   <div class="container" >
+        <h1 class="welcome">欢迎体验WeGo抢先版！</h1>
+		<h4>这是一次超乎想象的体验。</h4>
+		<div>
+			<button type="button" class="btn btn-default" onclick="window.location.href='{% url 'register' %}'">注册</button>
+			<button type="button" class="btn btn-default" onclick="window.location.href='{% url 'login' %}'">登录</button>
+			<button type="button" class="btn btn-default" onclick="window.location.href='/admin/'">后台</button>
+		</div>
+  </div>
+
+</body>
+</html>

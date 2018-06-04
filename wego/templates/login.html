@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>登录WeGo</title>
+    <link rel="stylesheet" href="/static/bootstrap-3.3.7-dist/css/bootstrap.css">
+    <style>
+        .form{
+            width: 500px;
+{#            左右居中，auto对上下没有效果#}
+            margin: 0 auto;
+            margin-top: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="form">
+        <div style="font-size: 30px;margin-left: 230px">登录</div>
+        {# novalidate 当提交表单时不对输入进行验证 #}
+{#        创建bootstrap的水平表单  class="form-horizontal" class="form-group" class="control-label"#}
+        <form class="form-horizontal" action="{% url 'login' %}" method="POST" novalidate>
+{#            csrf_token提交表单时防止跨站攻击#}
+            {% csrf_token %}
+              <div class="form-group">
+                    <label class="col-sm-2 control-label">用户名</label>
+                    <div class="col-sm-10">
+                       {# Form组件生成input框验证 包括返回错误信息 #}
+                      {{ form.username }}{{ form.errors.username.0 }}
+                    </div>
+              </div>
+              <div class="form-group">
+                    <label class="col-sm-2 control-label">密码</label>
+                    <div class="col-sm-10">
+                        {{ form.passwd }}{{ form.errors.passwd.0 }}{{ msg }}
+                    </div>
+              </div>
+              <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-10">
+                    <button type="submit" class="btn btn-default">登录</button>
+                    <button type="button" class="btn btn-default"  onclick="window.location.href='{% url 'welcome' %}'">返回</button>
+                </div>
+                </div>
+        </form>
+    </div>
+</body>
+</html>

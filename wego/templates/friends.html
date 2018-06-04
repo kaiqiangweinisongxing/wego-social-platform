@@ -1,0 +1,181 @@
+{% extends "index_base.html" %}
+{% block content %}
+     <ul class="list-group col-md-4 col-md-offset-4 well well-sm" >
+     {% for friend in friend_list_page %}
+         <div class="list-group-item" data-toggle="modal" data-target="#personData" onclick="seeData({{ friend.nid }})">
+            <span class="list-group-item-heading fa fa-address-book" style="font-size:17px">{{ friend.nickname }}</span>
+            <span class="list-group-item-text">({{ friend.username  }})</span>
+        </div>
+     {% endfor %}
+     <nav aria-label="navbar navbar-default" >
+                      <ul class="pagination  nav navbar-nav navbar-left">
+                          {{ page_info.pager|safe }}
+                      </ul>
+                    <ul class="pagination  nav navbar-nav navbar-right">
+                        <button class="btn btn-default" data-toggle="modal" data-target="#requestMsg" onclick="request_msg('GET')">◄)</button>
+                        <button class="btn btn-default " data-toggle="modal" data-target="#myModal">十</button>
+                    </ul>
+     </nav>
+    </ul>
+<!--查看资料-->
+
+  <div class="modal fade" id="personData" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true" data-keyboard="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close"
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel" align="center">
+               查看资料
+            </h4>
+         </div>
+        <form class="form-horizontal" action="{% url 'addFriend' %}" method="POST" novalidate>
+        {% csrf_token %}
+          <div class="modal-body">
+              <div class="form-group">
+                    <label class=" col-sm-offset-1 control-label" >用户名：</label><label id="f_username"></label>
+              </div>
+              <div class="form-group">
+                  <label class=" col-sm-offset-1 control-label" >昵称：</label><label id="f_nickname"></label>
+              </div>
+         </div>
+        </form>
+         <div class="modal-footer">
+             <input id="f_id" style="display: none" >
+            <button  type="button" class="btn btn-info" style="float: left" onclick="chat()">发消息</button>
+            <button  type="button" class="btn btn-danger" data-dismiss="modal" onclick="delete_f()">删除</button>
+         </div>
+      </div>
+    </div>
+    </div>
+
+
+
+<!--查找-->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+    <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close"
+               data-dismiss="modal" aria-hidden="true">
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel" align="center">
+               查找
+            </h4>
+         </div>
+        <form class="form-horizontal" action="{% url 'addFriend' %}" method="POST" novalidate>
+        {% csrf_token %}
+          <div class="modal-body">
+              <div class="form-group">
+                    <label class="col-sm-2 control-label">用户名</label>
+                    <div class="col-sm-10">
+                        <input id="username" type="text" class="form-control" placeholder="用户名">
+                        <div id="msg"></div>
+                    </div>
+              </div>
+         </div>
+        </form>
+         <div class="modal-footer">
+            <button  id='search' type="submit" class="btn btn-primary" name="operate" value="search" onclick="search_add('search')">查找</button>
+            <button  id='add' type="submit" class="btn btn-primary" name="operate" value="add" style="display: none" onclick="search_add('add')">加为好友</button>
+         </div>
+      </div>
+    </div>
+    </div>
+<!--请求消息-->
+ <div class="modal fade" id="requestMsg" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="false" data-keyboard="false">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <div class="modal-header">
+            <button type="button" class="close"
+               data-dismiss="modal" aria-hidden="true" onclick="window.location.href='{% url 'friendsList' %}'" >
+                  &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel" align="center">
+               好友请求消息
+            </h4>
+         </div>
+          <div class="modal-body"></div>
+      </div>
+    </div>
+    </div>
+
+    <script src="/static/jquery-3.2.1.js"></script>
+    <script>
+    //删除好友
+    function delete_f() {
+        var f_id = $('#f_id').val();
+        $.ajax({
+            type: 'POST',
+            url: "{% url 'delete' %}",
+            data:{'f_id': f_id},
+            dataType: 'JSON',
+            success: function(result) {
+                if(result.status == "200")
+                     {
+                         alert(result.msg)
+                         window.location.reload(true)   //刷新页面
+                     }
+            }
+      });
+
+    }
+
+    //发消息
+    function chat() {
+        var f_id = $('#f_id').val();
+        window.location.href='/chatroom/' + f_id + '/';
+    }
+
+    //查看资料
+    function seeData(id) {
+         $.ajax({
+            type: 'POST',
+            url: "{% url "seeData" %}",
+            data:{'f_id': id},
+            dataType: 'JSON',
+            success: function(result) {
+                $('#f_username').html(result.username);
+                $('#f_nickname').html(result.nickname);
+                $('#f_id').attr('value',id);
+            }
+      });
+    }
+
+    //查看好友请求信息
+    function request_msg(ajaxType,selection,f_id) {
+       $.ajax({
+            type: ajaxType,
+            url: "{% url 'friend_request' %}",
+            data:{'selection':selection, 'f_id': f_id},
+            dataType: 'html',           //dataType:String\xml\html\script\json\jsonp\text
+            success: function(result) {
+                $('.modal-body').html(result)
+            }
+      });
+    }
+
+    //查找、添加好友
+    function search_add(operate) {
+            //获取模态框数据
+            var username = $('#username').val();
+            var operate = operate;
+            $.ajax({
+                type: "POST",
+                url: "{% url 'addFriend' %}",
+                data: {'username': username,'operate':operate},
+                dataType: 'JSON',
+                success: function(result) {
+                    $("#msg").html(result.msg)
+                    if(result.status == 200)
+                       $("#add").css("display","inline")
+                    else
+                        $("#add").css("display","none")
+                }
+            });
+    }
+    </script>
+{% endblock %}
